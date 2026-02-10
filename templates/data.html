@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Students - SMS{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Student Details</h2>
+  <p class="caption">View and manage students.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Student ID</th><th>First Name</th><th>Last Name</th><th>Email</th><th>Phone</th>
+        <th>Date of Birth</th><th>Gender</th><th>Course</th><th>Year</th><th>Roll Number</th>
+        <th>City</th><th>Enrollment Time</th><th>Updated Time</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in students %}
+      <tr>
+        <td>{{ i[0] }}</td>
+        <td><a href="{{ url_for('view_student', id=i[0]) }}">{{ i[1] }}</a></td>
+        <td>{{ i[2] }}</td>
+        <td>{{ i[3] }}</td>
+        <td>{{ i[4] }}</td>
+        <td>{{ i[5] }}</td>
+        <td>{{ i[6] }}</td>
+        <td>{{ i[7] }}</td>
+        <td>{{ i[8] }}</td>
+        <td>{{ i[9] }}</td>
+        <td>{{ i[10] }}</td>
+        <td>{{ i[11] }}</td>
+        <td>{{ i[12] }}</td>
+        <td class="actions">
+          <a href="{{ url_for('update', id=i[0]) }}" class="button">Edit</a>
+          <form method="POST" action="{{ url_for('delete', id=i[0]) }}" style="display:inline;">
+            <button type="submit" class="button danger" onclick="return confirm('Delete?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

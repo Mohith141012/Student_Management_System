@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Signup - SMS{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Create Account</h2>
+  <form method="POST" action="{{ url_for('signup') }}" class="form-grid">
+    <div><label>First Name</label><input type="text" name="firstname" required /></div>
+    <div><label>Last Name</label><input type="text" name="lastname" required /></div>
+    <div><label>Email</label><input type="email" name="email" required /></div>
+    <div><label>Password</label><input type="password" name="password" required /></div>
+    <div><label>Location</label><input type="text" name="location" /></div>
+    <div><label>Mobile No</label><input type="tel" name="mobileno" /></div>
+    <div><label>Zip Code</label><input type="text" name="zipcode" /></div>
+    <div>
+      <label>Role</label>
+      <select name="role">
+        <option value="Student">Student</option>
+        <option value="Staff">Staff</option>
+        <option value="Admin">Admin</option>
+      </select>
+    </div>
+    <div class="actions"><button type="submit" class="button">Create</button></div>
+  </form>
+</div>
+{% endblock %}

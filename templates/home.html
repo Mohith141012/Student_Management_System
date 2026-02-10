@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Home - SMS{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Welcome {{ session['firstname'] if session.get('firstname') else 'Guest' }}</h2>
+  <p>This is the Student Management System.</p>
+  <div class="actions">
+    {% if not session.get('user_id') %}
+      <a href="{{ url_for('login') }}" class="button">Login</a>
+      <a href="{{ url_for('signup') }}" class="button">Signup</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

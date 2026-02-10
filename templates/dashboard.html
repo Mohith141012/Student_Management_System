@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - SMS{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Dashboard</h2>
+  <p>Logged in as: <strong>{{ name }}</strong> ({{ role }})</p>
+  <div class="actions">
+    {% if role == 'Student' %}
+      <a href="{{ url_for('student_profile') }}" class="button">My Profile</a>
+    {% endif %}
+    {% if role in ['Admin','Staff'] %}
+      <a href="{{ url_for('data') }}" class="button">Manage Students</a>
+    {% endif %}
+    {% if role == 'Admin' %}
+      <a href="{{ url_for('users') }}" class="button">Manage Users</a>
+      <a href="{{ url_for('export_students') }}" class="button">Export Students (CSV)</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

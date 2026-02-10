@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Student Profile - SMS{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Student Full Profile</h2>
+
+  {% if student %}
+  <div class="form-grid">
+    <div>
+      <label>Name</label>
+      <div>{{ student[1] }} {{ student[2] }}</div>
+    </div>
+    <div>
+      <label>Gender</label>
+      <div>{{ student[6] }}</div>
+    </div>
+    <div>
+      <label>Date of Birth</label>
+      <div>{{ student[5] }}</div>
+    </div>
+    <div>
+      <label>Course</label>
+      <div>{{ student[7] }}</div>
+    </div>
+    <div>
+      <label>Year</label>
+      <div>{{ student[8] }}</div>
+    </div>
+    <div>
+      <label>Roll Number</label>
+      <div>{{ student[9] }}</div>
+    </div>
+    <div>
+      <label>City</label>
+      <div>{{ student[10] }}</div>
+    </div>
+    <div>
+      <label>Email</label>
+      <div>{{ student[3] }}</div>
+    </div>
+    <div>
+      <label>Phone</label>
+      <div>{{ student[4] }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <h3>Marks & Grade</h3>
+  {% if marks_info %}
+  <table>
+    <thead>
+      <tr>
+        <th>Subject1</th><th>Subject2</th><th>Subject3</th><th>Total</th><th>Percentage</th><th>Grade</th><th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ marks_info.subject1 }}</td>
+        <td>{{ marks_info.subject2 }}</td>
+        <td>{{ marks_info.subject3 }}</td>
+        <td>{{ marks_info.total }}</td>
+        <td>{{ marks_info.percentage }}%</td>
+        <td>{{ marks_info.grade }}</td>
+        <td>{{ marks_info.result }}</td>
+      </tr>
+    </tbody>
+  </table>
+  {% else %}
+    <p class="caption">No marks available for this student.</p>
+  {% endif %}
+
+  <div class="actions">
+    {% if session.get('role') in ['Admin', 'Staff'] %}
+      <a href="{{ url_for('data') }}" class="button">Back to Students</a>
+    {% else %}
+      <a href="{{ url_for('dashboard') }}" class="button">Back to Dashboard</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

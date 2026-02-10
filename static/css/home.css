@@ -1,0 +1,61 @@
+/* Reset default margin & padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #4e73df, #1cc88a);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Container for links */
+body {
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Navigation Links */
+a {
+    text-decoration: none;
+    background-color: white;
+    color: #333;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover Effect */
+a:hover {
+    background-color: #2e59d9;
+    color: white;
+    transform: translateY(-3px);
+}
+
+/* Active Click Effect */
+a:active {
+    transform: scale(0.95);
+}
+.logout-btn {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #ff4444;
+                color: white;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+                z-index: 1000;
+            }
+            .logout-btn:hover {
+                background-color: #cc0000;
+            }
