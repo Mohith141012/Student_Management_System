@@ -245,10 +245,27 @@ def dashboard():
 @roles_required('Student')
 def student_profile():
     user_email = session.get('email')
+    user_id = session.get('user_id')
+
+    # Debug: Check what email we're looking for
+    print(f"Looking for student with email: {user_email}")
+
     cur.execute("select * from students where email=%s", (user_email,))
     student = cur.fetchone()
+
     if not student:
-        return "No profile found for this student", 404
+        # Student record doesn't exist - show helpful message
+        error_msg = f"""
+        <h2>Profile Not Found</h2>
+        <p>No student profile found for email: <strong>{user_email}</strong></p>
+        <p>This could happen if:</p>
+        <ul>
+            <li>You signed up before the student profile feature was added</li>
+            <li>Your account needs to be linked to a student record by an administrator</li>
+        </ul>
+        <p><a href="{url_for('dashboard')}">Back to Dashboard</a></p>
+        """
+        return error_msg, 404
 
     # Fetch marks for the student
     cur.execute("select subject1, subject2, subject3 from student_marks where student_id=%s", (student[0],))
@@ -321,6 +338,47 @@ def delete_user(id):
     cur.execute("delete from users where id=%s", (id,))
     con.commit()
     return redirect(url_for('users'))
+
+
+# Debug route - check database records (remove in production)
+@app.route('/debug/check-student')
+@login_required
+def debug_check_student():
+    user_email = session.get('email')
+
+    # Check users table
+    cur.execute("select id, firstname, lastname, email, role from users where email=%s", (user_email,))
+    user_record = cur.fetchone()
+
+    # Check students table
+    cur.execute("select id, first_name, last_name, email, course from students where email=%s", (user_email,))
+    student_record = cur.fetchone()
+
+    # Get all students (for debugging)
+    cur.execute("select id, email from students")
+    all_students = cur.fetchall()
+
+    output = f"""
+    <h2>Database Check for: {user_email}</h2>
+
+    <h3>User Record (users table):</h3>
+    <pre>{user_record}</pre>
+
+    <h3>Student Record (students table):</h3>
+    <pre>{student_record}</pre>
+
+    <h3>All Student Emails in Database:</h3>
+    <ul>
+    """
+    for student in all_students:
+        output += f"<li>ID: {student[0]} - Email: {student[1]}</li>"
+
+    output += """
+    </ul>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+    """
+
+    return output
 
 
 if __name__ == "__main__":
