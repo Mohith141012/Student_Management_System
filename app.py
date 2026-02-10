@@ -6,11 +6,16 @@ import csv
 from io import StringIO
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (for local development)
+load_dotenv()
 
 app = Flask(__name__)
 
-# Session secret key
-app.secret_key = "user_key"
+# Session secret key - use environment variable in production
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'user_key')
 
 # Session cookie security settings (place here, near top with other config)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -84,7 +89,13 @@ def calculate_marks_info(subject1, subject2, subject3):
 
 
 # Creating the connection to mysql database
-con = mysql.connect(host="localhost", user="root", password="123456789", database="sms")
+# Use environment variables for database configuration
+con = mysql.connect(
+    host=os.getenv('DB_HOST', 'localhost'),
+    user=os.getenv('DB_USER', 'root'),
+    password=os.getenv('DB_PASSWORD', '123456789'),
+    database=os.getenv('DB_NAME', 'sms')
+)
 
 # Creating cursor to execute sql queries
 cur = con.cursor()
@@ -282,4 +293,7 @@ def delete_user(id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Use PORT environment variable if available (for deployment platforms)
+    port = int(os.getenv('PORT', 5000))
+    debug = os.getenv('FLASK_ENV', 'development') != 'production'
+    app.run(host='0.0.0.0', port=port, debug=debug)
