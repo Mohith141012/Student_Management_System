@@ -9,6 +9,7 @@ CREATE TABLE users (
     location TEXT,
     mobileno BIGINT,
     zipcode INT,
+    role ENUM('Admin', 'Staff', 'Student') DEFAULT 'Student',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 INSERT INTO users (username, email, password) VALUES
@@ -88,6 +89,26 @@ INSERT INTO students (first_name, last_name, email, phone, date_of_birth, gender
 ('Aanya', 'Tripathi', 'aanya.tripathi@student.edu.in', '9876543249', '2005-01-14', 'Female', 'Biotechnology', 2, '2023BT001', 'Lucknow'),
 ('Shivansh', 'Bajaj', 'shivansh.bajaj@student.edu.in', '9876543250', '2006-03-06', 'Male', 'Electrical Engineering', 1, '2024EE001', 'Delhi'),
 ('Mysha', 'Hegde', 'mysha.hegde@student.edu.in', '9876543251', '2003-05-19', 'Female', 'Architecture', 4, '2021AR002', 'Bangalore');
+
+-- Create student_marks table
+CREATE TABLE IF NOT EXISTS student_marks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    subject1 INT DEFAULT NULL,
+    subject2 INT DEFAULT NULL,
+    subject3 INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+);
+
+-- Sample marks data (for the first few students)
+INSERT INTO student_marks (student_id, subject1, subject2, subject3) VALUES
+(1, 85, 90, 88),
+(2, 78, 82, 85),
+(3, 92, 88, 90),
+(4, 75, 79, 82),
+(5, 88, 85, 87);
 
 select * from students;
 select * from users;

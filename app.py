@@ -137,6 +137,25 @@ def signup():
         values = (firstname, lastname, email, hashed_password, location, mobileno, zipcode, role)
         cur.execute(query, values)
         con.commit()
+
+        # If role is Student, create a basic student record
+        if role == 'Student':
+            # Get additional student info from form (you'll need to add these fields to signup.html)
+            phone = request.form.get('phone', mobileno)  # Use mobile number as phone
+            dob = request.form.get('dob', '2000-01-01')  # Default or from form
+            gender = request.form.get('gender', 'Other')  # From form
+            course = request.form.get('course', 'Not Assigned')  # From form
+            year = request.form.get('year', 1)  # From form
+            roll_number = request.form.get('roll_number', f'STU{cur.lastrowid}')  # Auto-generate or from form
+            city = location  # Use location as city
+
+            student_query = """insert into students(first_name, last_name, email, phone, date_of_birth,
+                              gender, course, year, roll_number, city)
+                              values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+            student_values = (firstname, lastname, email, phone, dob, gender, course, year, roll_number, city)
+            cur.execute(student_query, student_values)
+            con.commit()
+
         return redirect(url_for('login'))
     return render_template('signup.html')
 
@@ -216,7 +235,16 @@ def student_profile():
     student = cur.fetchone()
     if not student:
         return "No profile found for this student", 404
-    return render_template('student_profile.html', student=student)
+
+    # Fetch marks for the student
+    cur.execute("select subject1, subject2, subject3 from student_marks where student_id=%s", (student[0],))
+    marks = cur.fetchone()
+
+    marks_info = None
+    if marks:
+        marks_info = calculate_marks_info(marks[0], marks[1], marks[2])
+
+    return render_template('student_profile.html', student=student, marks_info=marks_info)
 
 
 # Admin/Staff full-profile view used by data.html
