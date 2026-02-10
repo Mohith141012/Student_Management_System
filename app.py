@@ -131,6 +131,13 @@ def signup():
         role = request.form.get('role', 'Student').strip()
         if role not in ('Admin', 'Staff', 'Student'):
             role = 'Student'
+
+        # Check if email already exists in users table
+        cur.execute("select id from users where email=%s", (email,))
+        existing_user = cur.fetchone()
+        if existing_user:
+            return "Email already registered. Please login or use a different email.", 400
+
         hashed_password = generate_password_hash(password)
         query = """insert into users(firstname,lastname,email,password,location,mobileno,zipcode,role)
                    values (%s,%s,%s,%s,%s,%s,%s,%s)"""
@@ -138,23 +145,30 @@ def signup():
         cur.execute(query, values)
         con.commit()
 
-        # If role is Student, create a basic student record
+        # If role is Student, create a basic student record (only if it doesn't exist)
         if role == 'Student':
-            # Get additional student info from form (you'll need to add these fields to signup.html)
-            phone = request.form.get('phone', mobileno)  # Use mobile number as phone
-            dob = request.form.get('dob', '2000-01-01')  # Default or from form
-            gender = request.form.get('gender', 'Other')  # From form
-            course = request.form.get('course', 'Not Assigned')  # From form
-            year = request.form.get('year', 1)  # From form
-            roll_number = request.form.get('roll_number', f'STU{cur.lastrowid}')  # Auto-generate or from form
-            city = location  # Use location as city
+            # Check if student record already exists with this email
+            cur.execute("select id from students where email=%s", (email,))
+            existing_student = cur.fetchone()
 
-            student_query = """insert into students(first_name, last_name, email, phone, date_of_birth,
-                              gender, course, year, roll_number, city)
-                              values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-            student_values = (firstname, lastname, email, phone, dob, gender, course, year, roll_number, city)
-            cur.execute(student_query, student_values)
-            con.commit()
+            if not existing_student:
+                # Student record doesn't exist, create one
+                # Get additional student info from form (you'll need to add these fields to signup.html)
+                phone = request.form.get('phone', mobileno)  # Use mobile number as phone
+                dob = request.form.get('dob', '2000-01-01')  # Default or from form
+                gender = request.form.get('gender', 'Other')  # From form
+                course = request.form.get('course', 'Not Assigned')  # From form
+                year = request.form.get('year', 1)  # From form
+                roll_number = request.form.get('roll_number', f'STU{cur.lastrowid}')  # Auto-generate or from form
+                city = location  # Use location as city
+
+                student_query = """insert into students(first_name, last_name, email, phone, date_of_birth,
+                                  gender, course, year, roll_number, city)
+                                  values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+                student_values = (firstname, lastname, email, phone, dob, gender, course, year, roll_number, city)
+                cur.execute(student_query, student_values)
+                con.commit()
+            # If student record exists, it will be linked automatically by email
 
         return redirect(url_for('login'))
     return render_template('signup.html')
