@@ -2,27 +2,34 @@
 {% block title %}Manage Users - SMS{% endblock %}
 {% block content %}
 <div class="card">
-  <h2>Manage Users</h2>
-  <table>
-    <thead>
-      <tr><th>ID</th><th>First</th><th>Last</th><th>Email</th><th>Role</th><th>Actions</th></tr>
-    </thead>
-    <tbody>
-      {% for u in users %}
-      <tr>
-        <td>{{ u[0] }}</td>
-        <td>{{ u[1] }}</td>
-        <td>{{ u[2] }}</td>
-        <td>{{ u[3] }}</td>
-        <td>{{ u[4] }}</td>
-        <td class="actions">
-          <form method="POST" action="{{ url_for('delete_user', id=u[0]) }}" style="display:inline;">
-            <button type="submit" class="button danger" onclick="return confirm('Delete this user?')">Delete</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div style="margin-bottom:16px;">
+    <h2>Users</h2>
+    <p class="caption">{{ users | length }} registered users</p>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td style="color:var(--muted);">{{ loop.index }}</td>
+          <td style="font-weight:600;">{{ u[1] }} {{ u[2] }}</td>
+          <td style="color:var(--muted);">{{ u[3] }}</td>
+          <td>
+            <span class="badge badge-role badge-{{ u[4]|lower }}">{{ u[4] }}</span>
+          </td>
+          <td>
+            <form method="POST" action="{{ url_for('delete_user', id=u[0]) }}" style="margin:0;">
+              <button type="submit" class="button danger" style="padding:5px 12px; font-size:0.8rem;" onclick="return confirm('Delete this user?')">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

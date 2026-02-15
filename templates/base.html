@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Student Management System{% endblock %}</title>
     <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
     {% block head %}{% endblock %}
@@ -18,19 +19,22 @@
                     <a href="{{ url_for('dashboard') }}">Dashboard</a>
                     {% if session.get('role') in ['Admin', 'Staff'] %}
                         <a href="{{ url_for('data') }}">Students</a>
+                        <a href="{{ url_for('attendance') }}">Attendance</a>
+                    {% endif %}
+                    {% if session.get('role') == 'Student' %}
+                        <a href="{{ url_for('student_attendance') }}">My Attendance</a>
                     {% endif %}
                     {% if session.get('role') == 'Admin' %}
                         <a href="{{ url_for('users') }}">Users</a>
-                        <a href="{{ url_for('export_students') }}">Export CSV</a>
                     {% endif %}
                     <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
                 {% else %}
                     <a href="{{ url_for('login') }}">Login</a>
-                    <a href="{{ url_for('signup') }}">Signup</a>
+                    <a href="{{ url_for('signup') }}">Sign Up</a>
                 {% endif %}
             </nav>
             {% if session.get('user_id') %}
-                <div class="welcome">Welcome {{ session['firstname'] }} ({{ session['role'] }})</div>
+                <div class="welcome">{{ session['firstname'] }} &middot; {{ session['role'] }}</div>
             {% endif %}
         </div>
     </header>
@@ -40,7 +44,7 @@
     </main>
 
     <footer class="site-footer">
-        <p>&copy;  Student Management System</p>
+        <p>Student Management System &copy; 2025</p>
     </footer>
 
     {% block scripts %}

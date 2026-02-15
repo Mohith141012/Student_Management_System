@@ -1,14 +1,37 @@
 {% extends 'base.html' %}
 {% block title %}Home - SMS{% endblock %}
 {% block content %}
-<div class="card">
-  <h2>Welcome {{ session['firstname'] if session.get('firstname') else 'Guest' }}</h2>
-  <p>This is the Student Management System.</p>
-  <div class="actions">
-    {% if not session.get('user_id') %}
+<div class="hero">
+  {% if session.get('firstname') %}
+    <h2>Welcome back, {{ session['firstname'] }}</h2>
+    <p>Manage your academic records, track attendance, and stay on top of your progress.</p>
+    <div class="actions">
+      <a href="{{ url_for('dashboard') }}" class="button">Go to Dashboard</a>
+    </div>
+  {% else %}
+    <h2>Student Management System</h2>
+    <p>A complete platform for managing student records, tracking attendance, and monitoring academic performance.</p>
+    <div class="actions">
       <a href="{{ url_for('login') }}" class="button">Login</a>
-      <a href="{{ url_for('signup') }}" class="button">Signup</a>
-    {% endif %}
+      <a href="{{ url_for('signup') }}" class="button secondary">Create Account</a>
+    </div>
+  {% endif %}
+</div>
+
+{% if not session.get('user_id') %}
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; max-width:700px; margin:0 auto;">
+  <div class="stat-box" style="padding:20px;">
+    <span class="stat-value" style="font-size:1.3rem;">&#127891;</span>
+    <span class="stat-label" style="margin-top:8px;">Student Records</span>
+  </div>
+  <div class="stat-box" style="padding:20px;">
+    <span class="stat-value" style="font-size:1.3rem;">&#9989;</span>
+    <span class="stat-label" style="margin-top:8px;">Attendance Tracking</span>
+  </div>
+  <div class="stat-box" style="padding:20px;">
+    <span class="stat-value" style="font-size:1.3rem;">&#128200;</span>
+    <span class="stat-label" style="margin-top:8px;">Grades & Marks</span>
   </div>
 </div>
+{% endif %}
 {% endblock %}

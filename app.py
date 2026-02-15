@@ -83,6 +83,31 @@ def calculate_marks_info(subject1, subject2, subject3):
     }
 
 
+def get_attendance_info(student_id):
+    """Calculate attendance statistics for a student."""
+    cur.execute("""
+        SELECT COUNT(*) as total,
+               SUM(CASE WHEN status='Present' THEN 1 ELSE 0 END) as present_count,
+               SUM(CASE WHEN status='Absent' THEN 1 ELSE 0 END) as absent_count,
+               SUM(CASE WHEN status='Late' THEN 1 ELSE 0 END) as late_count
+        FROM attendance WHERE student_id=%s
+    """, (student_id,))
+    result = cur.fetchone()
+    if not result or result[0] == 0:
+        return None
+    total = result[0]
+    present = result[1]
+    absent = result[2]
+    late = result[3]
+    return {
+        'total_days': total,
+        'present_days': present,
+        'absent_days': absent,
+        'late_days': late,
+        'percentage': round(((present + late) / total) * 100, 1)
+    }
+
+
 # Creating the connection to mysql database
 con = mysql.connect(host="localhost", user="root", password="123456789", database="sms")
 
@@ -275,7 +300,8 @@ def student_profile():
     if marks:
         marks_info = calculate_marks_info(marks[0], marks[1], marks[2])
 
-    return render_template('student_profile.html', student=student, marks_info=marks_info)
+    attendance_info = get_attendance_info(student[0])
+    return render_template('student_profile.html', student=student, marks_info=marks_info, attendance_info=attendance_info)
 
 
 # Admin/Staff full-profile view used by data.html
@@ -294,7 +320,107 @@ def view_student(id):
     if marks:
         marks_info = calculate_marks_info(marks[0], marks[1], marks[2])
 
-    return render_template('student_profile.html', student=student, marks_info=marks_info)
+    attendance_info = get_attendance_info(id)
+    return render_template('student_profile.html', student=student, marks_info=marks_info, attendance_info=attendance_info)
+
+
+# Attendance marking page (Admin/Staff)
+@app.route('/attendance')
+@roles_required('Admin', 'Staff')
+def attendance():
+    today = date.today()
+    query = """
+        SELECT s.id, s.first_name, s.last_name, s.roll_number, s.course, s.year,
+               a.id AS attendance_id, a.status
+        FROM students s
+        LEFT JOIN attendance a ON s.id = a.student_id AND a.date = %s
+        ORDER BY s.year, s.course, s.roll_number
+    """
+    cur.execute(query, (today,))
+    students = cur.fetchall()
+    return render_template('attendance.html', students=students, today=today)
+
+
+# Mark attendance for students (Admin/Staff) - bulk submit
+@app.route('/attendance/mark', methods=['POST'])
+@roles_required('Admin', 'Staff')
+def mark_attendance():
+    today = date.today()
+    marked_by = session['user_id']
+
+    for key, status in request.form.items():
+        if not key.startswith('status_'):
+            continue
+        student_id = key.split('_', 1)[1]
+        if status not in ('Present', 'Absent', 'Late'):
+            continue
+        try:
+            cur.execute("""INSERT INTO attendance (student_id, date, status, marked_by)
+                           VALUES (%s, %s, %s, %s)""",
+                        (student_id, today, status, marked_by))
+            con.commit()
+        except mysql.IntegrityError:
+            con.rollback()
+
+    return redirect(url_for('attendance'))
+
+
+# Edit attendance record (Admin only)
+@app.route('/attendance/edit/<int:id>', methods=['GET', 'POST'])
+@roles_required('Admin')
+def edit_attendance(id):
+    if request.method == 'POST':
+        new_status = request.form['status']
+        if new_status in ('Present', 'Absent', 'Late'):
+            cur.execute("UPDATE attendance SET status=%s WHERE id=%s", (new_status, id))
+            con.commit()
+        return redirect(url_for('attendance'))
+
+    query = """
+        SELECT a.id, a.status, a.date, s.first_name, s.last_name, s.roll_number
+        FROM attendance a
+        JOIN students s ON a.student_id = s.id
+        WHERE a.id = %s
+    """
+    cur.execute(query, (id,))
+    record = cur.fetchone()
+    if not record:
+        return "Attendance record not found", 404
+    return render_template('edit_attendance.html', record=record)
+
+
+# Student's own attendance view
+@app.route('/student/attendance')
+@roles_required('Student')
+def student_attendance():
+    user_email = session.get('email')
+    cur.execute("SELECT id, first_name, last_name FROM students WHERE email=%s", (user_email,))
+    student = cur.fetchone()
+
+    if not student:
+        return "Student profile not found. Please contact an administrator.", 404
+
+    cur.execute("""SELECT date, status FROM attendance
+                   WHERE student_id=%s ORDER BY date DESC""", (student[0],))
+    records = cur.fetchall()
+
+    total_days = len(records)
+    present_days = sum(1 for r in records if r[1] == 'Present')
+    late_days = sum(1 for r in records if r[1] == 'Late')
+    absent_days = sum(1 for r in records if r[1] == 'Absent')
+    percentage = round(((present_days + late_days) / total_days) * 100, 1) if total_days > 0 else 0
+
+    attendance_info = {
+        'total_days': total_days,
+        'present_days': present_days,
+        'absent_days': absent_days,
+        'late_days': late_days,
+        'percentage': percentage
+    }
+
+    return render_template('student_attendance.html',
+                           student=student, records=records,
+                           attendance_info=attendance_info)
 
 
 # Logout

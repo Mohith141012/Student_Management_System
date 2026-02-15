@@ -110,5 +110,19 @@ INSERT INTO student_marks (student_id, subject1, subject2, subject3) VALUES
 (4, 75, 79, 82),
 (5, 88, 85, 87);
 
+-- Create attendance table
+CREATE TABLE IF NOT EXISTS attendance (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    date DATE NOT NULL,
+    status ENUM('Present', 'Absent', 'Late') NOT NULL,
+    marked_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (marked_by) REFERENCES users(id),
+    UNIQUE KEY unique_student_date (student_id, date)
+);
+
 select * from students;
 select * from users;

@@ -2,18 +2,47 @@
 {% block title %}Dashboard - SMS{% endblock %}
 {% block content %}
 <div class="card">
-  <h2>Dashboard</h2>
-  <p>Logged in as: <strong>{{ name }}</strong> ({{ role }})</p>
-  <div class="actions">
+  <h2>Welcome back, {{ name }}</h2>
+  <p class="caption">You are logged in as <strong>{{ role }}</strong></p>
+
+  <div class="dash-grid">
     {% if role == 'Student' %}
-      <a href="{{ url_for('student_profile') }}" class="button">My Profile</a>
+      <a href="{{ url_for('student_profile') }}" class="dash-card">
+        <span class="dash-icon">&#128100;</span>
+        <span class="dash-title">My Profile</span>
+        <span class="dash-desc">View your details & grades</span>
+      </a>
+      <a href="{{ url_for('student_attendance') }}" class="dash-card">
+        <span class="dash-icon">&#128203;</span>
+        <span class="dash-title">My Attendance</span>
+        <span class="dash-desc">Check your attendance record</span>
+      </a>
     {% endif %}
+
     {% if role in ['Admin','Staff'] %}
-      <a href="{{ url_for('data') }}" class="button">Manage Students</a>
+      <a href="{{ url_for('data') }}" class="dash-card">
+        <span class="dash-icon">&#127891;</span>
+        <span class="dash-title">Manage Students</span>
+        <span class="dash-desc">View & manage student records</span>
+      </a>
+      <a href="{{ url_for('attendance') }}" class="dash-card">
+        <span class="dash-icon">&#9989;</span>
+        <span class="dash-title">Mark Attendance</span>
+        <span class="dash-desc">Take today's attendance</span>
+      </a>
     {% endif %}
+
     {% if role == 'Admin' %}
-      <a href="{{ url_for('users') }}" class="button">Manage Users</a>
-      <a href="{{ url_for('export_students') }}" class="button">Export Students (CSV)</a>
+      <a href="{{ url_for('users') }}" class="dash-card">
+        <span class="dash-icon">&#128101;</span>
+        <span class="dash-title">Manage Users</span>
+        <span class="dash-desc">View & manage user accounts</span>
+      </a>
+      <a href="{{ url_for('export_students') }}" class="dash-card">
+        <span class="dash-icon">&#128196;</span>
+        <span class="dash-title">Export CSV</span>
+        <span class="dash-desc">Download student data</span>
+      </a>
     {% endif %}
   </div>
 </div>

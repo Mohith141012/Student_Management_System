@@ -1,25 +1,33 @@
 {% extends 'base.html' %}
-{% block title %}Signup - SMS{% endblock %}
+{% block title %}Sign Up - SMS{% endblock %}
 {% block content %}
-<div class="card">
-  <h2>Create Account</h2>
-  <form method="POST" action="{{ url_for('signup') }}" class="form-grid">
-    <div><label>First Name</label><input type="text" name="firstname" required /></div>
-    <div><label>Last Name</label><input type="text" name="lastname" required /></div>
-    <div><label>Email</label><input type="email" name="email" required /></div>
-    <div><label>Password</label><input type="password" name="password" required /></div>
-    <div><label>Location</label><input type="text" name="location" /></div>
-    <div><label>Mobile No</label><input type="tel" name="mobileno" /></div>
-    <div><label>Zip Code</label><input type="text" name="zipcode" /></div>
-    <div>
-      <label>Role</label>
-      <select name="role">
-        <option value="Student">Student</option>
-        <option value="Staff">Staff</option>
-        <option value="Admin">Admin</option>
-      </select>
+<div class="auth-wrapper">
+  <div class="auth-card wide">
+    <h2>Create Account</h2>
+    <p class="auth-sub">Fill in your details to get started</p>
+    <form method="POST" action="{{ url_for('signup') }}" class="form-grid">
+      <div><label>First Name</label><input type="text" name="firstname" placeholder="John" required /></div>
+      <div><label>Last Name</label><input type="text" name="lastname" placeholder="Doe" required /></div>
+      <div><label>Email</label><input type="email" name="email" placeholder="you@example.com" required /></div>
+      <div><label>Password</label><input type="password" name="password" placeholder="Create a password" required /></div>
+      <div><label>Location</label><input type="text" name="location" placeholder="Your city" /></div>
+      <div><label>Mobile No</label><input type="tel" name="mobileno" placeholder="9876543210" /></div>
+      <div><label>Zip Code</label><input type="text" name="zipcode" placeholder="400001" /></div>
+      <div>
+        <label>Role</label>
+        <select name="role">
+          <option value="Student">Student</option>
+          <option value="Staff">Staff</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <button type="submit" class="button" style="width:100%; padding:12px;">Create Account</button>
+      </div>
+    </form>
+    <div class="auth-footer">
+      Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
     </div>
-    <div class="actions"><button type="submit" class="button">Create</button></div>
-  </form>
+  </div>
 </div>
 {% endblock %}

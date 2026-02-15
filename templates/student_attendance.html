@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}My Attendance - SMS{% endblock %}
+{% block head %}
+<style>
+  .attendance-hero { text-align: center; padding: 20px 0 8px; }
+  .attendance-hero h2 { margin-bottom: 4px; }
+  .percentage-ring { display: inline-flex; align-items: center; justify-content: center; width: 120px; height: 120px; border-radius: 50%; border: 6px solid var(--border); margin: 16px 0; position: relative; }
+  .percentage-ring.good { border-color: var(--accent); }
+  .percentage-ring.warn { border-color: #f59e0b; }
+  .percentage-ring.danger { border-color: var(--danger); }
+  .percentage-ring .pct { font-size: 1.8rem; font-weight: 700; }
+  .percentage-ring.good .pct { color: var(--accent); }
+  .percentage-ring.warn .pct { color: #f59e0b; }
+  .percentage-ring.danger .pct { color: var(--danger); }
+  .status-msg { font-size: 0.9rem; margin-top: 4px; }
+  .status-msg.good { color: var(--accent); }
+  .status-msg.warn { color: #f59e0b; }
+  .status-msg.danger { color: var(--danger); }
+  .stat-grid-5 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+  .history-section { margin-top: 20px; }
+  .history-section h3 { margin-bottom: 12px; }
+  .month-label td { background: var(--bg); font-weight: 600; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 12px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="attendance-hero">
+    <h2>My Attendance</h2>
+    <p class="caption">{{ student[1] }} {{ student[2] }}</p>
+
+    {% if attendance_info and attendance_info.total_days > 0 %}
+      {% set pct = attendance_info.percentage %}
+      {% set level = 'good' if pct >= 75 else ('warn' if pct >= 50 else 'danger') %}
+
+      <div class="percentage-ring {{ level }}">
+        <span class="pct">{{ pct }}%</span>
+      </div>
+      <div class="status-msg {{ level }}">
+        {% if pct >= 75 %}Good standing
+        {% elif pct >= 50 %}Needs improvement
+        {% else %}Low attendance - contact your advisor{% endif %}
+      </div>
+
+      <div class="stat-grid-5">
+        <div class="stat-box">
+          <span class="stat-value">{{ attendance_info.total_days }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" style="color:var(--accent);">{{ attendance_info.present_days }}</span>
+          <span class="stat-label">Present</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" style="color:#f59e0b;">{{ attendance_info.late_days }}</span>
+          <span class="stat-label">Late</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" style="color:var(--danger);">{{ attendance_info.absent_days }}</span>
+          <span class="stat-label">Absent</span>
+        </div>
+      </div>
+
+      <div class="progress-bar" style="margin-top:0;">
+        <div class="progress-fill {{ 'progress-good' if pct >= 75 else ('progress-warn' if pct >= 50 else 'progress-danger') }}"
+             style="width: {{ pct }}%"></div>
+      </div>
+    {% else %}
+      <p class="caption" style="padding:20px 0;">No attendance records yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="history-section">
+    <h3>Attendance History</h3>
+    {% if records %}
+    <table>
+      <thead>
+        <tr><th style="width:50px;">#</th><th>Date</th><th>Day</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% set ns = namespace(current_month='', count=0) %}
+        {% for r in records %}
+          {% set month = r[0].strftime('%B %Y') %}
+          {% if month != ns.current_month %}
+            {% set ns.current_month = month %}
+            <tr class="month-label"><td colspan="4">{{ month }}</td></tr>
+          {% endif %}
+          {% set ns.count = ns.count + 1 %}
+          <tr>
+            <td style="color:var(--muted);">{{ ns.count }}</td>
+            <td>{{ r[0].strftime('%d %b %Y') }}</td>
+            <td>{{ r[0].strftime('%A') }}</td>
+            <td>
+              <span class="badge {{ 'badge-present' if r[1] == 'Present' else ('badge-late' if r[1] == 'Late' else 'badge-absent') }}">
+                {{ r[1] }}
+              </span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="caption">No attendance records found.</p>
+    {% endif %}
+  </div>
+
+  <div class="actions" style="margin-top:16px;">
+    <a href="{{ url_for('dashboard') }}" class="button">Back to Dashboard</a>
+  </div>
+</div>
+{% endblock %}

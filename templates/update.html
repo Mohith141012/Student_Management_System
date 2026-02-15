@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}Update Student - SMS{% endblock %}
 {% block content %}
-<div class="card">
-  <h2>Update Student Information</h2>
-  <form method="POST" class="form-grid">
+<div class="card" style="max-width:700px; margin:0 auto;">
+  <h2>Update Student</h2>
+  <p class="caption">Edit information for {{ data[1] }} {{ data[2] }}</p>
+
+  <form method="POST" class="form-grid" style="margin-top:16px;">
     <div><label>First Name</label><input type="text" name="firstname" value="{{ data[1] }}" required /></div>
     <div><label>Last Name</label><input type="text" name="lastname" value="{{ data[2] }}" required /></div>
     <div><label>Email</label><input type="email" name="email" value="{{ data[3] }}" required /></div>
@@ -17,10 +19,13 @@
       </select>
     </div>
     <div><label>Course</label><input type="text" name="course" value="{{ data[7] }}" required /></div>
-    <div><label>Year</label><input type="number" name="year" value="{{ data[8] }}" required /></div>
+    <div><label>Year</label><input type="number" name="year" value="{{ data[8] }}" min="1" max="6" required /></div>
     <div><label>Roll Number</label><input type="text" name="roll_number" value="{{ data[9] }}" required /></div>
     <div><label>City</label><input type="text" name="city" value="{{ data[10] }}" /></div>
-    <div class="actions"><button type="submit" class="button">Save Changes</button></div>
+    <div style="grid-column: 1 / -1;" class="actions">
+      <button type="submit" class="button">Save Changes</button>
+      <a href="{{ url_for('data') }}" class="button secondary">Cancel</a>
+    </div>
   </form>
 </div>
 {% endblock %}

@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block title %}Attendance - SMS{% endblock %}
+{% block head %}
+<style>
+  .attendance-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+  .attendance-header h2 { margin: 0; }
+  .date-badge { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 0.95rem; color: var(--text); }
+  .date-badge strong { color: var(--accent); }
+  .attendance-table th, .attendance-table td { vertical-align: middle; }
+  .attendance-table tr:hover { background: rgba(255,255,255,0.02); }
+  .status-radios { display: flex; gap: 6px; }
+  .status-radio { display: none; }
+  .status-radio + label {
+    padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border); color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s;
+  }
+  .status-radio + label:hover { border-color: var(--muted); }
+  .status-radio[value="Present"]:checked + label { background: rgba(34,197,94,0.15); color: var(--accent); border-color: rgba(34,197,94,0.4); }
+  .status-radio[value="Absent"]:checked + label { background: rgba(239,68,68,0.15); color: var(--danger); border-color: rgba(239,68,68,0.4); }
+  .status-radio[value="Late"]:checked + label { background: rgba(245,158,11,0.15); color: #f59e0b; border-color: rgba(245,158,11,0.4); }
+  .submit-bar { position: sticky; bottom: 0; background: var(--panel); border-top: 1px solid var(--border); padding: 14px 16px; margin: 16px -16px -16px; border-radius: 0 0 8px 8px; display: flex; justify-content: space-between; align-items: center; }
+  .submit-bar .count { color: var(--muted); font-size: 0.9rem; }
+  .submit-bar .count strong { color: var(--text); }
+  .btn-submit-all { padding: 10px 28px; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; background: var(--accent); color: #052e1b; font-weight: 700; transition: opacity 0.2s; }
+  .btn-submit-all:hover { opacity: 0.9; }
+  .btn-submit-all:disabled { opacity: 0.4; cursor: not-allowed; }
+  .year-divider td { background: var(--bg); font-weight: 600; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="attendance-header">
+    <h2>Mark Attendance</h2>
+    <div class="date-badge">
+      <strong>{{ today.strftime('%A') }}</strong>, {{ today.strftime('%d %B %Y') }}
+    </div>
+  </div>
+
+  {% set unmarked = students | selectattr(7, 'none') | list %}
+  {% set all_locked = (unmarked | length == 0) %}
+
+  {% if all_locked %}
+    <div style="text-align:center; padding:24px 0;">
+      <p style="font-size:1.1rem; color:var(--accent); font-weight:600;">All attendance marked for today</p>
+      <p class="caption">{{ students | length }} students recorded</p>
+    </div>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('mark_attendance') }}" id="attendanceForm">
+    <table class="attendance-table">
+      <thead>
+        <tr>
+          <th style="width:50px;">#</th>
+          <th>Roll No</th>
+          <th>Student</th>
+          <th>Course</th>
+          <th>Year</th>
+          <th>Status</th>
+          {% if session.get('role') == 'Admin' %}
+          <th style="width:70px;"></th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% set ns = namespace(current_year=0, count=0) %}
+        {% for s in students %}
+          {% if s[5] != ns.current_year %}
+            {% set ns.current_year = s[5] %}
+            <tr class="year-divider"><td colspan="{{ 7 if session.get('role') == 'Admin' else 6 }}">Year {{ s[5] }}</td></tr>
+          {% endif %}
+          {% set ns.count = ns.count + 1 %}
+          <tr>
+            <td style="color:var(--muted);">{{ ns.count }}</td>
+            <td><code style="color:var(--link);">{{ s[3] }}</code></td>
+            <td>{{ s[1] }} {{ s[2] }}</td>
+            <td>{{ s[4] }}</td>
+            <td>{{ s[5] }}</td>
+            <td>
+              {% if s[7] %}
+                <span class="badge {{ 'badge-present' if s[7] == 'Present' else ('badge-late' if s[7] == 'Late' else 'badge-absent') }}">
+                  {{ s[7] }}
+                </span>
+              {% else %}
+                <div class="status-radios">
+                  <input type="radio" name="status_{{ s[0] }}" value="Present" id="p_{{ s[0] }}" class="status-radio unmarked-radio">
+                  <label for="p_{{ s[0] }}">P</label>
+                  <input type="radio" name="status_{{ s[0] }}" value="Absent" id="a_{{ s[0] }}" class="status-radio unmarked-radio">
+                  <label for="a_{{ s[0] }}">A</label>
+                  <input type="radio" name="status_{{ s[0] }}" value="Late" id="l_{{ s[0] }}" class="status-radio unmarked-radio">
+                  <label for="l_{{ s[0] }}">L</label>
+                </div>
+              {% endif %}
+            </td>
+            {% if session.get('role') == 'Admin' %}
+            <td>
+              {% if s[7] %}
+                <a href="{{ url_for('edit_attendance', id=s[6]) }}" class="button" style="font-size:0.8rem; padding:4px 10px;">Edit</a>
+              {% endif %}
+            </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if not all_locked %}
+    <div class="submit-bar">
+      <div class="count">
+        <strong id="markedCount">0</strong> / <strong>{{ unmarked | length }}</strong> students marked
+      </div>
+      <button type="submit" class="btn-submit-all" id="submitBtn" disabled>Submit Attendance</button>
+    </div>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const radios = document.querySelectorAll('.unmarked-radio');
+  const submitBtn = document.getElementById('submitBtn');
+  const countEl = document.getElementById('markedCount');
+  if (!radios.length) return;
+
+  const totalUnmarked = {{ unmarked | length }};
+  const names = new Set();
+  radios.forEach(r => names.add(r.name));
+
+  function updateCount() {
+    let marked = 0;
+    names.forEach(name => {
+      if (document.querySelector('input[name="' + name + '"]:checked')) marked++;
+    });
+    if (countEl) countEl.textContent = marked;
+    if (submitBtn) submitBtn.disabled = (marked === 0);
+  }
+
+  radios.forEach(r => r.addEventListener('change', updateCount));
+});
+</script>
+{% endblock %}

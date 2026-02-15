@@ -2,41 +2,50 @@
 {% block title %}Students - SMS{% endblock %}
 {% block content %}
 <div class="card">
-  <h2>Student Details</h2>
-  <p class="caption">View and manage students.</p>
-  <table>
-    <thead>
-      <tr>
-        <th>Student ID</th><th>First Name</th><th>Last Name</th><th>Email</th><th>Phone</th>
-        <th>Date of Birth</th><th>Gender</th><th>Course</th><th>Year</th><th>Roll Number</th>
-        <th>City</th><th>Enrollment Time</th><th>Updated Time</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for i in students %}
-      <tr>
-        <td>{{ i[0] }}</td>
-        <td><a href="{{ url_for('view_student', id=i[0]) }}">{{ i[1] }}</a></td>
-        <td>{{ i[2] }}</td>
-        <td>{{ i[3] }}</td>
-        <td>{{ i[4] }}</td>
-        <td>{{ i[5] }}</td>
-        <td>{{ i[6] }}</td>
-        <td>{{ i[7] }}</td>
-        <td>{{ i[8] }}</td>
-        <td>{{ i[9] }}</td>
-        <td>{{ i[10] }}</td>
-        <td>{{ i[11] }}</td>
-        <td>{{ i[12] }}</td>
-        <td class="actions">
-          <a href="{{ url_for('update', id=i[0]) }}" class="button">Edit</a>
-          <form method="POST" action="{{ url_for('delete', id=i[0]) }}" style="display:inline;">
-            <button type="submit" class="button danger" onclick="return confirm('Delete?')">Delete</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+    <div>
+      <h2>Students</h2>
+      <p class="caption">{{ students | length }} students registered</p>
+    </div>
+    {% if session.get('role') == 'Admin' %}
+    <a href="{{ url_for('export_students') }}" class="button secondary">Export CSV</a>
+    {% endif %}
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Name</th><th>Roll Number</th><th>Course</th>
+          <th>Year</th><th>Email</th><th>Gender</th><th>City</th>
+          {% if session.get('role') == 'Admin' %}<th>Actions</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in students %}
+        <tr>
+          <td style="color:var(--muted);">{{ loop.index }}</td>
+          <td><a href="{{ url_for('view_student', id=i[0]) }}" style="font-weight:600;">{{ i[1] }} {{ i[2] }}</a></td>
+          <td><code style="color:var(--link);">{{ i[9] }}</code></td>
+          <td>{{ i[7] }}</td>
+          <td>{{ i[8] }}</td>
+          <td style="color:var(--muted);">{{ i[3] }}</td>
+          <td>{{ i[6] }}</td>
+          <td>{{ i[10] }}</td>
+          {% if session.get('role') == 'Admin' %}
+          <td>
+            <div style="display:flex; gap:6px;">
+              <a href="{{ url_for('update', id=i[0]) }}" class="button" style="padding:5px 12px; font-size:0.8rem;">Edit</a>
+              <form method="POST" action="{{ url_for('delete', id=i[0]) }}" style="margin:0;">
+                <button type="submit" class="button danger" style="padding:5px 12px; font-size:0.8rem;" onclick="return confirm('Delete this student?')">Delete</button>
+              </form>
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

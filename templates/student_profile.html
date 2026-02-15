@@ -2,55 +2,66 @@
 {% block title %}Student Profile - SMS{% endblock %}
 {% block content %}
 <div class="card">
-  <h2>Student Full Profile</h2>
-
   {% if student %}
-  <div class="form-grid">
-    <div>
-      <label>Name</label>
-      <div>{{ student[1] }} {{ student[2] }}</div>
+  <div class="profile-header">
+    <div class="profile-avatar">{{ student[1][0] }}{{ student[2][0] }}</div>
+    <div class="profile-meta">
+      <h2>{{ student[1] }} {{ student[2] }}</h2>
+      <p class="caption">{{ student[7] }} &middot; Year {{ student[8] }} &middot; {{ student[9] }}</p>
     </div>
-    <div>
-      <label>Gender</label>
-      <div>{{ student[6] }}</div>
-    </div>
-    <div>
-      <label>Date of Birth</label>
-      <div>{{ student[5] }}</div>
-    </div>
-    <div>
-      <label>Course</label>
-      <div>{{ student[7] }}</div>
-    </div>
-    <div>
-      <label>Year</label>
-      <div>{{ student[8] }}</div>
-    </div>
-    <div>
-      <label>Roll Number</label>
-      <div>{{ student[9] }}</div>
-    </div>
-    <div>
-      <label>City</label>
-      <div>{{ student[10] }}</div>
-    </div>
-    <div>
+  </div>
+
+  <div class="profile-grid">
+    <div class="profile-field">
       <label>Email</label>
-      <div>{{ student[3] }}</div>
+      <div class="value">{{ student[3] }}</div>
     </div>
-    <div>
+    <div class="profile-field">
       <label>Phone</label>
-      <div>{{ student[4] }}</div>
+      <div class="value">{{ student[4] }}</div>
+    </div>
+    <div class="profile-field">
+      <label>Date of Birth</label>
+      <div class="value">{{ student[5] }}</div>
+    </div>
+    <div class="profile-field">
+      <label>Gender</label>
+      <div class="value">{{ student[6] }}</div>
+    </div>
+    <div class="profile-field">
+      <label>City</label>
+      <div class="value">{{ student[10] }}</div>
+    </div>
+    <div class="profile-field">
+      <label>Roll Number</label>
+      <div class="value"><code style="color:var(--link);">{{ student[9] }}</code></div>
     </div>
   </div>
   {% endif %}
 
-  <h3>Marks & Grade</h3>
+  {% if attendance_info %}
+  <div class="section-divider"><h3>Attendance</h3></div>
+  <div class="attendance-mini">
+    <div class="progress-bar">
+      <div class="progress-fill {% if attendance_info.percentage >= 75 %}progress-good{% elif attendance_info.percentage >= 50 %}progress-warn{% else %}progress-danger{% endif %}"
+           style="width: {{ attendance_info.percentage }}%">
+      </div>
+    </div>
+    <p class="caption" style="margin-top:6px;">
+      {{ attendance_info.percentage }}% &mdash;
+      {{ attendance_info.present_days }}P / {{ attendance_info.late_days }}L / {{ attendance_info.absent_days }}A
+      ({{ attendance_info.total_days }} days)
+    </p>
+  </div>
+  {% endif %}
+
+  <div class="section-divider"><h3>Marks & Grade</h3></div>
   {% if marks_info %}
   <table>
     <thead>
       <tr>
-        <th>Subject1</th><th>Subject2</th><th>Subject3</th><th>Total</th><th>Percentage</th><th>Grade</th><th>Result</th>
+        <th>Subject 1</th><th>Subject 2</th><th>Subject 3</th>
+        <th>Total</th><th>Percentage</th><th>Grade</th><th>Result</th>
       </tr>
     </thead>
     <tbody>
@@ -58,22 +69,33 @@
         <td>{{ marks_info.subject1 }}</td>
         <td>{{ marks_info.subject2 }}</td>
         <td>{{ marks_info.subject3 }}</td>
-        <td>{{ marks_info.total }}</td>
-        <td>{{ marks_info.percentage }}%</td>
-        <td>{{ marks_info.grade }}</td>
-        <td>{{ marks_info.result }}</td>
+        <td style="font-weight:600;">{{ marks_info.total }}</td>
+        <td style="font-weight:600;">{{ marks_info.percentage }}%</td>
+        <td>
+          <span class="badge {% if marks_info.grade == 'Fail' %}badge-absent{% elif marks_info.grade in ['A+','A'] %}badge-present{% else %}badge-late{% endif %}">
+            {{ marks_info.grade }}
+          </span>
+        </td>
+        <td>
+          <span class="badge {{ 'badge-present' if marks_info.result == 'Pass' else 'badge-absent' }}">
+            {{ marks_info.result }}
+          </span>
+        </td>
       </tr>
     </tbody>
   </table>
   {% else %}
-    <p class="caption">No marks available for this student.</p>
+    <div class="empty-state">
+      <div class="empty-icon">&#128218;</div>
+      <p>No marks available for this student.</p>
+    </div>
   {% endif %}
 
   <div class="actions">
     {% if session.get('role') in ['Admin', 'Staff'] %}
-      <a href="{{ url_for('data') }}" class="button">Back to Students</a>
+      <a href="{{ url_for('data') }}" class="button secondary">Back to Students</a>
     {% else %}
-      <a href="{{ url_for('dashboard') }}" class="button">Back to Dashboard</a>
+      <a href="{{ url_for('dashboard') }}" class="button secondary">Back to Dashboard</a>
     {% endif %}
   </div>
 </div>
