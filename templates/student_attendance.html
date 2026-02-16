@@ -5,17 +5,17 @@
   .attendance-hero { text-align: center; padding: 20px 0 8px; }
   .attendance-hero h2 { margin-bottom: 4px; }
   .percentage-ring { display: inline-flex; align-items: center; justify-content: center; width: 120px; height: 120px; border-radius: 50%; border: 6px solid var(--border); margin: 16px 0; position: relative; }
-  .percentage-ring.good { border-color: var(--accent); }
-  .percentage-ring.warn { border-color: #f59e0b; }
-  .percentage-ring.danger { border-color: var(--danger); }
+  .percentage-ring.good { border-color: var(--emerald); }
+  .percentage-ring.warn { border-color: var(--amber); }
+  .percentage-ring.danger { border-color: var(--rose); }
   .percentage-ring .pct { font-size: 1.8rem; font-weight: 700; }
-  .percentage-ring.good .pct { color: var(--accent); }
-  .percentage-ring.warn .pct { color: #f59e0b; }
-  .percentage-ring.danger .pct { color: var(--danger); }
+  .percentage-ring.good .pct { color: var(--emerald); }
+  .percentage-ring.warn .pct { color: var(--amber); }
+  .percentage-ring.danger .pct { color: var(--rose); }
   .status-msg { font-size: 0.9rem; margin-top: 4px; }
-  .status-msg.good { color: var(--accent); }
-  .status-msg.warn { color: #f59e0b; }
-  .status-msg.danger { color: var(--danger); }
+  .status-msg.good { color: var(--emerald); }
+  .status-msg.warn { color: var(--amber); }
+  .status-msg.danger { color: var(--rose); }
   .stat-grid-5 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
   .history-section { margin-top: 20px; }
   .history-section h3 { margin-bottom: 12px; }
@@ -47,15 +47,15 @@
           <span class="stat-label">Total</span>
         </div>
         <div class="stat-box">
-          <span class="stat-value" style="color:var(--accent);">{{ attendance_info.present_days }}</span>
+          <span class="stat-value" style="color:var(--emerald);">{{ attendance_info.present_days }}</span>
           <span class="stat-label">Present</span>
         </div>
         <div class="stat-box">
-          <span class="stat-value" style="color:#f59e0b;">{{ attendance_info.late_days }}</span>
+          <span class="stat-value" style="color:var(--amber);">{{ attendance_info.late_days }}</span>
           <span class="stat-label">Late</span>
         </div>
         <div class="stat-box">
-          <span class="stat-value" style="color:var(--danger);">{{ attendance_info.absent_days }}</span>
+          <span class="stat-value" style="color:var(--rose);">{{ attendance_info.absent_days }}</span>
           <span class="stat-label">Absent</span>
         </div>
       </div>

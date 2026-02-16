@@ -19,18 +19,18 @@
 </div>
 
 {% if not session.get('user_id') %}
-<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; max-width:700px; margin:0 auto;">
-  <div class="stat-box" style="padding:20px;">
-    <span class="stat-value" style="font-size:1.3rem;">&#127891;</span>
-    <span class="stat-label" style="margin-top:8px;">Student Records</span>
+<div class="feature-grid">
+  <div class="feature-card feat-purple">
+    <span class="feature-icon">&#127891;</span>
+    <span class="feature-label">Student Records</span>
   </div>
-  <div class="stat-box" style="padding:20px;">
-    <span class="stat-value" style="font-size:1.3rem;">&#9989;</span>
-    <span class="stat-label" style="margin-top:8px;">Attendance Tracking</span>
+  <div class="feature-card feat-green">
+    <span class="feature-icon">&#9989;</span>
+    <span class="feature-label">Attendance Tracking</span>
   </div>
-  <div class="stat-box" style="padding:20px;">
-    <span class="stat-value" style="font-size:1.3rem;">&#128200;</span>
-    <span class="stat-label" style="margin-top:8px;">Grades & Marks</span>
+  <div class="feature-card feat-blue">
+    <span class="feature-icon">&#128200;</span>
+    <span class="feature-label">Grades & Marks</span>
   </div>
 </div>
 {% endif %}
